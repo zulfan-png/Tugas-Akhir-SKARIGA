@@ -217,7 +217,7 @@ if (!empty($bus['fasilitas'])) {
             right: 20px;
         }
 
-        /* Info Bus - Layout Baru */
+        /* Info Bus - Layout Baru yang Lebih Rapi */
         .bus-info {
             padding: 20px 0;
         }
@@ -227,41 +227,63 @@ if (!empty($bus['fasilitas'])) {
             font-weight: 700;
             color: #1e293b;
             margin-bottom: 20px;
+            line-height: 1.3;
         }
 
+        /* Spesifikasi dalam grid yang rapi */
         .bus-specs {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            color: #64748b;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
         .spec-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             background: #f1f5f9;
-            padding: 10px 15px;
+            padding: 15px;
             border-radius: 8px;
-            min-width: 120px;
+            border-left: 4px solid #1e40af;
         }
 
         .spec-item i {
             color: #1e40af;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
         }
 
-        /* Fasilitas - Pindah ke bawah spesifikasi */
+        .spec-label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            color: #1e293b;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        /* Fasilitas - Pindah ke bawah spesifikasi dan di atas deskripsi */
         .facilities-section {
-            margin-bottom: 30px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            grid-column: 1 / -1;
         }
 
         .section-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             color: #1e293b;
             margin-bottom: 15px;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             border-bottom: 2px solid #e2e8f0;
         }
 
@@ -279,6 +301,7 @@ if (!empty($bus['fasilitas'])) {
             background: #f8fafc;
             border-radius: 8px;
             border: 1px solid #e2e8f0;
+            font-size: 14px;
         }
 
         .facility-item i {
@@ -286,14 +309,10 @@ if (!empty($bus['fasilitas'])) {
             font-size: 14px;
         }
 
-        /* Deskripsi - Mentok kanan kiri di bawah slider */
+        /* Deskripsi - Sekarang di bawah fasilitas */
         .description-section {
-            background: white;
-            padding: 30px;
+            padding: 30px;  
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-            margin-top: 40px;
             grid-column: 1 / -1;
         }
 
@@ -303,7 +322,7 @@ if (!empty($bus['fasilitas'])) {
             text-align: justify;
         }
 
-        /* Harga - Desain Baru yang Lebih Mudah Dibaca */
+        /* Harga */
         .pricing-section {
             background: white;
             padding: 40px;
@@ -487,13 +506,11 @@ if (!empty($bus['fasilitas'])) {
             }
             
             .bus-specs {
-                flex-direction: column;
-                gap: 10px;
+                grid-template-columns: 1fr;
             }
             
-            .spec-item {
-                min-width: auto;
-                justify-content: center;
+            .facilities-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             }
             
             .pricing-grid {
@@ -520,8 +537,13 @@ if (!empty($bus['fasilitas'])) {
             }
             
             .description-section {
-                margin-top: 20px;
+                margin-top: 0;
                 padding: 20px;
+            }
+            
+            .facilities-section {
+                padding: 20px;
+                margin-bottom: 20px;
             }
         }
     </style>
@@ -589,48 +611,64 @@ if (!empty($bus['fasilitas'])) {
                 <?php endif; ?>
             </div>
 
-            <!-- Bus Info - Layout Baru -->
+            <!-- Bus Info - Layout Baru yang Lebih Rapi -->
             <div class="bus-info">
                 <h1 class="bus-title"><?php echo $bus['perusahaan'] ?> - <?php echo $bus['tipe bus'] ?></h1>
                 
-                <!-- Spesifikasi: Jenis, Kapasitas, Tipe -->
+                <!-- Spesifikasi dalam grid yang rapi -->
                 <div class="bus-specs">
                     <div class="spec-item">
-                        <i class="fas fa-bus"></i>
-                        <span><?php echo $bus['jenis'] ?></span>
-                    </div>
-                    <div class="spec-item">
-                        <i class="fas fa-users"></i>
-                        <span><?php echo $bus['kapasitas'] ?> Kursi</span>
+                        <i class="fas fa-building"></i>
+                        <div>
+                            <div class="spec-label">Perusahaan</div>
+                            <div class="spec-value"><?php echo $bus['perusahaan'] ?></div>
+                        </div>
                     </div>
                     <div class="spec-item">
                         <i class="fas fa-tag"></i>
-                        <span><?php echo $bus['tipe bus'] ?></span>
+                        <div>
+                            <div class="spec-label">Tipe Bus</div>
+                            <div class="spec-value"><?php echo $bus['tipe bus'] ?></div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Fasilitas - Sekarang di bawah spesifikasi -->
-                <div class="facilities-section">
-                    <h3 class="section-title">Fasilitas</h3>
-                    <div class="facilities-grid">
-                        <?php foreach($fasilitas_array as $fasilitas): ?>
-                            <div class="facility-item">
-                                <i class="fas fa-check-circle"></i>
-                                <span><?php echo $fasilitas ?></span>
-                            </div>
-                        <?php endforeach; ?>
+                    <div class="spec-item">
+                        <i class="fas fa-bus"></i>
+                        <div>
+                            <div class="spec-label">Jenis</div>
+                            <div class="spec-value"><?php echo $bus['jenis'] ?></div>
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <i class="fas fa-users"></i>
+                        <div>
+                            <div class="spec-label">Kapasitas</div>
+                            <div class="spec-value"><?php echo $bus['kapasitas'] ?> Kursi</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Deskripsi - Mentok kanan kiri di bawah slider -->
+            <!-- Fasilitas - Sekarang di bawah spesifikasi dan di atas deskripsi -->
+            <div class="facilities-section">
+                <h3 class="section-title">Fasilitas</h3>
+                <div class="facilities-grid">
+                    <?php foreach($fasilitas_array as $fasilitas): ?>
+                        <div class="facility-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span><?php echo $fasilitas ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Deskripsi - Sekarang di bawah fasilitas -->
             <div class="description-section">
                 <h3 class="section-title">Deskripsi</h3>
                 <p class="description-text"><?php echo $bus['deskripsi'] ?></p>
             </div>
         </div>
 
-        <!-- Harga - Desain Baru yang Lebih Mudah Dibaca -->
+        <!-- Harga -->
         <div class="pricing-section">
             <div class="pricing-header">
                 <h2 class="pricing-title">Daftar Harga Sewa</h2>
