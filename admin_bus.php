@@ -1,3 +1,5 @@
+[file name]: admin_bus.php
+[file content begin]
 <?php
 include 'koneksi.php';
 session_start();
@@ -44,6 +46,7 @@ session_start();
                                         <th>Tipe Bus</th>
                                         <th>Jenis</th>
                                         <th>Kapasitas</th>
+                                        <th>Status</th>
                                         <th>Fasilitas</th>
                                         <th>Deskripsi</th>
                                         <th>Gambar</th>
@@ -67,6 +70,12 @@ session_start();
                                             <td><?php echo $row['tipe bus'] ?></td>
                                             <td><?php echo $row['jenis'] ?></td>
                                             <td><?php echo $row['kapasitas'] ?></td>
+                                            <td>
+                                                <span class="label label-<?php echo $row['status'] == 'Tersedia' ? 'success' : 'warning' ?>">
+                                                    <?php echo $row['status'] ?>
+                                                </span>
+                                                <br>
+                                            </td>
                                             <td><?php echo substr($row['fasilitas'], 0, 30) . '...' ?></td>
                                             <td><?php echo substr($row['deskripsi'], 0, 30) . '...' ?></td>
                                             <td>
@@ -107,7 +116,7 @@ session_start();
                                     <?php }
                                     } else { ?>
                                         <tr>
-                                            <td colspan="10" style="text-align: center; padding: 20px;">
+                                            <td colspan="11" style="text-align: center; padding: 20px;">
                                                 <i class="fa fa-exclamation-circle"></i> Tidak ada data bus
                                             </td>
                                         </tr>
@@ -127,3 +136,4 @@ session_start();
 <!-- /.content-wrapper -->
 
 <?php include 'footer.php'; ?>
+[file content end] 

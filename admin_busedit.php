@@ -1,3 +1,5 @@
+[file name]: admin_busedit.php
+[file content begin]
 <?php
 include 'koneksi.php';
 
@@ -42,6 +44,14 @@ if(!empty($row['fasilitas'])) {
         <div>
             <label>Kapasitas:</label>
             <input type="number" name="kapasitas" value="<?php echo $row['kapasitas'] ?>" required>
+        </div>
+
+        <div>
+            <label>Status:</label>
+            <select name="status" required>
+                <option value="Tersedia" <?php echo $row['status'] == 'Tersedia' ? 'selected' : '' ?>>Tersedia</option>
+                <option value="Dipesan" <?php echo $row['status'] == 'Dipesan' ? 'selected' : '' ?>>Dipesan</option>
+            </select>
         </div>
 
         <div>
@@ -106,3 +116,4 @@ if(!empty($row['fasilitas'])) {
     </form>
 </body>
 </html>
+[file content end]

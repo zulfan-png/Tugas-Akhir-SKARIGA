@@ -1,3 +1,5 @@
+[file name]: admin_busproses_tambah.php
+[file content begin]
 <?php
 include "koneksi.php";
 
@@ -5,6 +7,7 @@ $perusahaan = $_POST['perusahaan'];
 $tipe_bus = $_POST['tipe_bus'];
 $jenis = $_POST['jenis'];
 $kapasitas = $_POST['kapasitas'];
+$status = $_POST['status'];
 $deskripsi = $_POST['deskripsi'];
 $harga1 = $_POST['harga1'];
 $harga2 = $_POST['harga2'];
@@ -19,8 +22,8 @@ if(isset($_POST['fasilitas'])) {
     $fasilitas = implode(", ", $_POST['fasilitas']);
 }
 
-$query = "INSERT INTO bus (perusahaan, `tipe bus`, jenis, kapasitas, fasilitas, deskripsi, harga1, harga2, harga3, harga4, harga5, harga6) 
-          VALUES ('$perusahaan', '$tipe_bus', '$jenis', '$kapasitas', '$fasilitas', '$deskripsi', '$harga1', '$harga2', '$harga3', '$harga4', '$harga5', '$harga6')";
+$query = "INSERT INTO bus (perusahaan, `tipe bus`, jenis, kapasitas, status, fasilitas, deskripsi, harga1, harga2, harga3, harga4, harga5, harga6) 
+          VALUES ('$perusahaan', '$tipe_bus', '$jenis', '$kapasitas', '$status', '$fasilitas', '$deskripsi', '$harga1', '$harga2', '$harga3', '$harga4', '$harga5', '$harga6')";
 $result = mysqli_query($connect, $query);
 
 if ($result) {
@@ -35,3 +38,4 @@ if ($result) {
     </script>";
 }
 ?>
+[file content end]

@@ -1,3 +1,5 @@
+[file name]: admin_busproses_edit.php
+[file content begin]
 <?php
 include "koneksi.php";
 
@@ -6,6 +8,7 @@ $perusahaan = $_POST['perusahaan'];
 $tipe_bus = $_POST['tipe_bus'];
 $jenis = $_POST['jenis'];
 $kapasitas = $_POST['kapasitas'];
+$status = $_POST['status'];
 $deskripsi = $_POST['deskripsi'];
 $harga1 = $_POST['harga1'];
 $harga2 = $_POST['harga2'];
@@ -25,6 +28,7 @@ $query = "UPDATE bus SET
           `tipe bus` = '$tipe_bus',
           jenis = '$jenis',
           kapasitas = '$kapasitas',
+          status = '$status',
           fasilitas = '$fasilitas',
           deskripsi = '$deskripsi',
           harga1 = '$harga1',
@@ -48,3 +52,4 @@ if ($result) {
     </script>";
 }
 ?>
+[file content end]

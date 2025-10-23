@@ -1,3 +1,5 @@
+[file name]: admin_bustambah.php
+[file content begin]
 <?php
 include 'koneksi.php';
 ?>
@@ -29,6 +31,14 @@ include 'koneksi.php';
         <div>
             <label>Kapasitas:</label>
             <input type="number" name="kapasitas" required>
+        </div>
+
+        <div>
+            <label>Status:</label>
+            <select name="status" required>
+                <option value="Tersedia" selected>Tersedia</option>
+                <option value="Dipesan">Dipesan</option>
+            </select>
         </div>
 
         <div>
@@ -93,3 +103,4 @@ include 'koneksi.php';
     </form>
 </body>
 </html>
+[file content end]

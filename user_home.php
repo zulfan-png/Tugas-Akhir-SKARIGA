@@ -341,7 +341,7 @@
         .detail-btn:hover {
             background: #3730a3;
         }
-        
+
         /* Status badge */
         .status-badge {
             position: absolute;
@@ -403,6 +403,19 @@
             flex-direction: column;
             height: 100%;
         }
+
+        /* Counter bus tersedia */
+        .bus-counter {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .counter-number {
+            font-weight: 600;
+            color: #1e40af;
+        }
     </style>
 </head>
 <body>
@@ -439,16 +452,25 @@
             <h1>Pilihan Bus Terbaik</h1>
             <p>Temukan bus perfect untuk perjalanan Anda</p>
         </div>
-        
-        <div class="cards-container">
-            <?php
-            // Query untuk mengambil data dari tabel bus
-            $query = "SELECT b.*, 
-                     (SELECT gambar_url FROM bus_gambar WHERE bus_id = b.id LIMIT 1) as gambar_utama 
-                     FROM bus b";
-            $result = mysqli_query($connect, $query);
 
-            if (mysqli_num_rows($result) > 0) {
+        <?php
+        // Query untuk mengambil data bus yang statusnya 'Tersedia' saja
+        $query = "SELECT b.*, 
+                 (SELECT gambar_url FROM bus_gambar WHERE bus_id = b.id LIMIT 1) as gambar_utama 
+                 FROM bus b 
+                 WHERE b.status = 'Tersedia'";
+        $result = mysqli_query($connect, $query);
+        $jumlah_bus_tersedia = mysqli_num_rows($result);
+        ?>
+
+        <!-- Counter bus tersedia -->
+        <div class="bus-counter">
+            Menampilkan <span class="counter-number"><?php echo $jumlah_bus_tersedia; ?></span> bus tersedia untuk Anda
+        </div>
+        
+        <div class="cards-container" id="bus-cards">
+            <?php
+            if ($jumlah_bus_tersedia > 0) {
                 while($row = mysqli_fetch_array($result)){
                     // Cek apakah ada gambar di database
                     $backgroundImage = '';
@@ -516,6 +538,9 @@
                     <i class="fas fa-bus-slash"></i>
                     <h3>Maaf, tidak ada bus tersedia saat ini</h3>
                     <p>Semua bus sedang dipesan atau sedang dalam perawatan.</p>
+                    <p style="margin-top: 10px; font-size: 14px;">
+                        Silakan coba lagi nanti atau hubungi customer service kami.
+                    </p>
                 </div>
             <?php } ?>
         </div>

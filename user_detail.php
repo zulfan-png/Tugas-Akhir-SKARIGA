@@ -710,7 +710,7 @@ if (!empty($bus['fasilitas'])) {
                         <div class="price-item">
                             <span class="duration">
                                 <i class="fas fa-clock"></i>
-                                24 Jam
+                                24 Jam / Per-Hari
                             </span>
                             <span class="price">
                                 Rp <?php echo number_format($bus['harga3'], 0, ',', '.') ?>
@@ -754,7 +754,7 @@ if (!empty($bus['fasilitas'])) {
                         <div class="price-item">
                             <span class="duration">
                                 <i class="fas fa-clock"></i>
-                                24 Jam
+                                24 Jam / Per-Hari
                             </span>
                             <span class="price">
                                 Rp <?php echo number_format($bus['harga6'], 0, ',', '.') ?>
