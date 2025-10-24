@@ -1,5 +1,3 @@
-[file name]: admin_bus.php
-[file content begin]
 <?php
 include 'koneksi.php';
 session_start();
@@ -136,4 +134,3 @@ session_start();
 <!-- /.content-wrapper -->
 
 <?php include 'footer.php'; ?>
-[file content end] 

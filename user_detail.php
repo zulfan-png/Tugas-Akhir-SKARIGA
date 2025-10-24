@@ -567,7 +567,7 @@ if (!empty($bus['fasilitas'])) {
     <div class="container">
         <!-- Breadcrumb -->
         <div class="breadcrumb">
-            <a href="user_dashboard.php"><i class="fas fa-arrow-left"></i> Kembali ke Daftar Bus</a>
+            <a href="user_home.php"><i class="fas fa-arrow-left"></i> Kembali ke Daftar Bus</a>
         </div>
 
         <div class="detail-layout">
