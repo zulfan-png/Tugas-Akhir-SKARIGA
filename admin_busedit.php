@@ -2,9 +2,16 @@
 include 'koneksi.php';
 
 $id = $_GET['id'];
-$query = "SELECT * FROM bus WHERE id = $id";
+$query = "SELECT b.*, p.nama_perusahaan 
+          FROM bus b 
+          LEFT JOIN perusahaan_bus p ON b.perusahaan_id = p.id 
+          WHERE b.id = $id";
 $result = mysqli_query($connect, $query);
 $row = mysqli_fetch_array($result);
+
+// Ambil data perusahaan untuk dropdown
+$query_perusahaan = "SELECT * FROM perusahaan_bus";
+$result_perusahaan = mysqli_query($connect, $query_perusahaan);
 
 // Pisahkan fasilitas menjadi array
 $fasilitas_array = [];
@@ -12,7 +19,6 @@ if(!empty($row['fasilitas'])) {
     $fasilitas_array = explode(", ", $row['fasilitas']);
 }
 
-// Include header
 include 'header.php';
 ?>
 
@@ -47,7 +53,15 @@ include 'header.php';
                             
                             <div class="form-group">
                                 <label>Perusahaan:</label>
-                                <input type="text" name="perusahaan" class="form-control" value="<?php echo $row['perusahaan'] ?>" required>
+                                <select name="perusahaan_id" class="form-control" required>
+                                    <option value="">Pilih Perusahaan</option>
+                                    <?php while($perusahaan = mysqli_fetch_array($result_perusahaan)): ?>
+                                        <option value="<?php echo $perusahaan['id'] ?>" 
+                                            <?php echo $row['perusahaan_id'] == $perusahaan['id'] ? 'selected' : '' ?>>
+                                            <?php echo $perusahaan['nama_perusahaan'] ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
                             </div>
                             
                             <div class="form-group">
@@ -69,10 +83,12 @@ include 'header.php';
                                 <label>Status:</label>
                                 <select name="status" class="form-control" required>
                                     <option value="Tersedia" <?php echo $row['status'] == 'Tersedia' ? 'selected' : '' ?>>Tersedia</option>
-                                    <option value="Dipesan" <?php echo $row['status'] == 'Dipesan' ? 'selected' : '' ?>>Dipesan</option>
+                                    <option value="Dalam Perawatan" <?php echo $row['status'] == 'Dalam Perawatan' ? 'selected' : '' ?>>Dalam Perawatan</option>
+                                    <option value="Tidak Tersedia" <?php echo $row['status'] == 'Tidak Tersedia' ? 'selected' : '' ?>>Tidak Tersedia</option>
                                 </select>
                             </div>
 
+                            <!-- Fasilitas section remains the same -->
                             <div class="form-group">
                                 <label>Fasilitas:</label><br>
                                 <div class="row">
@@ -119,56 +135,6 @@ include 'header.php';
                                 <label>Deskripsi:</label>
                                 <textarea name="deskripsi" class="form-control" rows="3" required><?php echo $row['deskripsi'] ?></textarea>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="box box-info">
-                                        <div class="box-header with-border">
-                                            <h3 class="box-title">Harga Weekday</h3>
-                                        </div>
-                                        <div class="box-body">
-                                            <div class="form-group">
-                                                <label>Harga 6 jam:</label>
-                                                <input type="number" name="harga1" class="form-control" value="<?php echo $row['harga1'] ?>" required>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label>Harga 12 jam:</label>
-                                                <input type="number" name="harga2" class="form-control" value="<?php echo $row['harga2'] ?>" required>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label>Harga 24 jam:</label>
-                                                <input type="number" name="harga3" class="form-control" value="<?php echo $row['harga3'] ?>" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="box box-success">
-                                        <div class="box-header with-border">
-                                            <h3 class="box-title">Harga Weekend</h3>
-                                        </div>
-                                        <div class="box-body">
-                                            <div class="form-group">
-                                                <label>Harga 6 jam:</label>
-                                                <input type="number" name="harga4" class="form-control" value="<?php echo $row['harga4'] ?>" required>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label>Harga 12 jam:</label>
-                                                <input type="number" name="harga5" class="form-control" value="<?php echo $row['harga5'] ?>" required>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label>Harga 24 jam:</label>
-                                                <input type="number" name="harga6" class="form-control" value="<?php echo $row['harga6'] ?>" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <!-- /.box-body -->
 
@@ -187,9 +153,6 @@ include 'header.php';
 <!-- /.content-wrapper -->
 
 <?php
-// Include sidebar
 include 'sidebar.php';
-
-// Include footer
 include 'footer.php';
 ?>

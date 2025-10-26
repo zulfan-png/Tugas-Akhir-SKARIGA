@@ -3,8 +3,11 @@ include 'koneksi.php';
 
 $bus_id = $_GET['id'];
 
-// Ambil data bus
-$query_bus = "SELECT * FROM bus WHERE id = $bus_id";
+// Ambil data bus dengan join perusahaan
+$query_bus = "SELECT b.*, p.nama_perusahaan 
+              FROM bus b 
+              LEFT JOIN perusahaan_bus p ON b.perusahaan_id = p.id 
+              WHERE b.id = $bus_id";
 $result_bus = mysqli_query($connect, $query_bus);
 $bus = mysqli_fetch_array($result_bus);
 
@@ -12,6 +15,9 @@ $bus = mysqli_fetch_array($result_bus);
 $query_gambar = "SELECT * FROM bus_gambar WHERE bus_id = $bus_id";
 $result_gambar = mysqli_query($connect, $query_gambar);
 ?>
+<!-- ... rest of the HTML remains the same, just update the title ... -->
+
+<!-- ... rest of the code ... -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -86,7 +92,7 @@ $result_gambar = mysqli_query($connect, $query_gambar);
 </head>
 <body>
     <div>
-        <h1>Kelola Gambar Bus - <?php echo $bus['perusahaan'] ?> <?php echo $bus['tipe bus'] ?></h1>
+        <h1>Kelola Gambar Bus - <?php echo $bus['nama_perusahaan'] ?> <?php echo $bus['tipe bus'] ?></h1>
         <a href="admin_bus.php">Kembali ke Data Bus</a>
         
         <!-- Drag & Drop Zone -->

@@ -40,13 +40,19 @@ include 'header.php';
                             <input type="hidden" name="id" value="<?php echo $row['id'] ?>">
                             
                             <div class="form-group">
-                                <label>Nama</label>
-                                <input type="text" name="user" class="form-control" value="<?php echo $row['user'] ?>" required>
+                                <label>Nama Lengkap</label>
+                                <input type="text" name="nama_lengkap" class="form-control" value="<?php echo $row['nama_lengkap'] ?>" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" name="username" class="form-control" value="<?php echo $row['username'] ?>" required>
                             </div>
                             
                             <div class="form-group">
                                 <label>Password</label>
                                 <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak diubah">
+                                <small class="text-muted">Biarkan kosong jika tidak ingin mengubah password</small>
                             </div>
                             
                             <div class="form-group">
@@ -56,14 +62,21 @@ include 'header.php';
                             
                             <div class="form-group">
                                 <label>Nomor HP</label>
-                                <input type="text" name="nomor_hp" class="form-control" value="<?php echo $row['nomor hp'] ?>" required>
+                                <input type="text" name="nomor_hp" class="form-control" value="<?php echo $row['nomor_hp'] ?>" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Alamat</label>
+                                <textarea name="alamat" class="form-control" rows="3"><?php echo $row['alamat'] ?? '' ?></textarea>
                             </div>
 
                             <div class="form-group">
                                 <label>Level</label>
                                 <select name="level" class="form-control" required>
-                                    <option value="1" <?php echo $row['level'] == 1 ? 'selected' : ''; ?>>User</option>
-                                    <option value="2" <?php echo $row['level'] == 2 ? 'selected' : ''; ?>>Admin</option>
+                                    <option value="customer" <?php echo $row['level'] == 'customer' ? 'selected' : ''; ?>>Customer</option>
+                                    <option value="admin" <?php echo $row['level'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
+                                    <option value="operator" <?php echo $row['level'] == 'operator' ? 'selected' : ''; ?>>Operator</option>
+                                    <option value="supir" <?php echo $row['level'] == 'supir' ? 'selected' : ''; ?>>Supir</option>
                                 </select>
                             </div>
                         </div>

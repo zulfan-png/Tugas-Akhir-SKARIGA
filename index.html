@@ -143,20 +143,20 @@
                 <h1>BUS LOGIN</h1>
                 <p>Masuk ke sistem admin bus</p>
             </div>
-            
             <form action="login.php" method="post" class="login-form">
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="Username" placeholder="Masukkan username" required>
+                    <input type="text" id="username" name="username" placeholder="Masukkan username" required>
+                    <!-- FIXED: name="username" -->
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="Password" placeholder="Masukkan password" required>
+                    <input type="password" id="password" name="password" placeholder="Masukkan password" required>
+                    <!-- FIXED: name="password" -->
                 </div>
                 
-                <button type="submit" class="btn-login"></i> Masuk
-                </button>
+                <button type="submit" class="btn-login">Masuk</button>
             </form>
         </div>
     </div>

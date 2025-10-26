@@ -1,22 +1,47 @@
 <?php
-    include 'koneksi.php';
+include 'koneksi.php';
 
-    $user = $_POST['Username'];
-    $pass = $_POST['Password'];
+// Ambil data dari form
+$username = $_POST['username'];
+$password = $_POST['password'];
 
+// Query untuk mencari user
+$query = "SELECT * FROM datauser WHERE username = '$username' AND password = '$password'";
+$result = mysqli_query($connect, $query);
 
-    $query = "SELECT * FROM datauser WHERE user='$user' and password='$pass'";
-    $result = mysqli_query($connect, $query);
+if ($result && mysqli_num_rows($result) > 0) {
     $row = mysqli_fetch_assoc($result);
-
-    if ($row['level'] == 1) {
-        header('Location: user_home.php');
-    } else if ($row['level'] == 2) {
-        header('Location: admin_bus.php');
-    } else {
-        echo "<script>
-        alert('Anda gagal login');
-        window.location.href = 'index.html';
-        </script>";
+    
+    // Start session
+    session_start();
+    $_SESSION['user_id'] = $row['id'];
+    $_SESSION['username'] = $row['username'];
+    $_SESSION['nama_lengkap'] = $row['nama_lengkap'];
+    $_SESSION['level'] = $row['level'];
+    
+    // Redirect berdasarkan level
+    switch ($row['level']) {
+        case 'customer':
+            header('Location: user_home.php');
+            break;
+        case 'admin':
+            header('Location: admin_bus.php');
+            break;
+        case 'operator':
+            header('Location: operator_dashboard.php');
+            break;
+        case 'supir':
+            header('Location: supir_dashboard.php');
+            break;
+        default:
+            header('Location: admin_bus.php');
+            break;
     }
+    exit;
+} else {
+    echo "<script>
+    alert('Username atau password salah!');
+    window.location.href = 'index.html';
+    </script>";
+}
 ?>

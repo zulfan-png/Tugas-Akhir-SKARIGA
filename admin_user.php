@@ -1,4 +1,4 @@
-    <?php
+<?php
     include 'koneksi.php';
     session_start();
     ?>
@@ -41,10 +41,11 @@
                                     <thead>
                                         <tr class="bg-primary">
                                             <th>ID User</th>
-                                            <th>Nama</th>
-                                            <th>Password</th>
+                                            <th>Nama Lengkap</th>
+                                            <th>Username</th>
                                             <th>Email</th>
                                             <th>Nomor HP</th>
+                                            <th>Alamat</th>
                                             <th>Level</th>
                                             <th>Aksi</th>
                                         </tr>
@@ -59,19 +60,21 @@
                                         ?>
                                             <tr>
                                                 <td><?php echo $row['id'] ?></td>
-                                                <td><?php echo $row['user'] ?></td>
-                                                <td><?php echo substr($row['password'], 0, 10) . '...' ?></td>
+                                                <td><?php echo $row['nama_lengkap'] ?></td>
+                                                <td><?php echo $row['username'] ?></td>
                                                 <td><?php echo $row['email'] ?></td>
-                                                <td><?php echo $row['nomor hp'] ?></td>
+                                                <td><?php echo $row['nomor_hp'] ?></td>
+                                                <td><?php echo substr($row['alamat'] ?? '', 0, 30) . '...' ?></td>
                                                 <td>
                                                     <?php 
-                                                    if ($row['level'] == 1) {
-                                                        echo '<span class="label label-success">User</span>';
-                                                    } elseif ($row['level'] == 2) {
-                                                        echo '<span class="label label-primary">Admin</span>';
-                                                    } else {
-                                                        echo '<span class="label label-default">' . $row['level'] . '</span>';
-                                                    }
+                                                    $level_badge = [
+                                                        'admin' => 'danger',
+                                                        'operator' => 'warning', 
+                                                        'supir' => 'info',
+                                                        'customer' => 'success'
+                                                    ];
+                                                    $badge_color = $level_badge[$row['level']] ?? 'default';
+                                                    echo '<span class="label label-' . $badge_color . '">' . ucfirst($row['level']) . '</span>';
                                                     ?>
                                                 </td>
                                                 <td>
@@ -88,7 +91,7 @@
                                         <?php }
                                         } else { ?>
                                             <tr>
-                                                <td colspan="7" style="text-align: center; padding: 20px;">
+                                                <td colspan="8" style="text-align: center; padding: 20px;">
                                                     <i class="fa fa-exclamation-circle"></i> Tidak ada data user
                                                 </td>
                                             </tr>

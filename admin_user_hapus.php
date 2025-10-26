@@ -13,7 +13,7 @@ if ($result) {
     </script>";
 } else {
     echo "<script>
-    alert('GAGAL MENGHAPUS DATA');
+    alert('GAGAL MENGHAPUS DATA: " . mysqli_error($connect) . "');
     window.location.href = 'admin_user.php';
     </script>";
 }

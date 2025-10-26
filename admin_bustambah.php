@@ -1,7 +1,10 @@
 <?php
 include 'koneksi.php';
 
-// Include header
+// Ambil data perusahaan untuk dropdown
+$query_perusahaan = "SELECT * FROM perusahaan_bus";
+$result_perusahaan = mysqli_query($connect, $query_perusahaan);
+
 include 'header.php';
 ?>
 
@@ -34,7 +37,14 @@ include 'header.php';
                         <div class="box-body">
                             <div class="form-group">
                                 <label>Perusahaan:</label>
-                                <input type="text" name="perusahaan" class="form-control" required>
+                                <select name="perusahaan_id" class="form-control" required>
+                                    <option value="">Pilih Perusahaan</option>
+                                    <?php while($perusahaan = mysqli_fetch_array($result_perusahaan)): ?>
+                                        <option value="<?php echo $perusahaan['id'] ?>">
+                                            <?php echo $perusahaan['nama_perusahaan'] ?>
+                                        </option>
+                                    <?php endwhile; ?>
+                                </select>
                             </div>
                             
                             <div class="form-group">
@@ -56,10 +66,12 @@ include 'header.php';
                                 <label>Status:</label>
                                 <select name="status" class="form-control" required>
                                     <option value="Tersedia" selected>Tersedia</option>
-                                    <option value="Dipesan">Dipesan</option>
+                                    <option value="Dalam Perawatan">Dalam Perawatan</option>
+                                    <option value="Tidak Tersedia">Tidak Tersedia</option>
                                 </select>
                             </div>
 
+                            <!-- Fasilitas section remains the same -->
                             <div class="form-group">
                                 <label>Fasilitas:</label><br>
                                 <div class="row">
@@ -106,56 +118,6 @@ include 'header.php';
                                 <label>Deskripsi:</label>
                                 <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="box box-info">
-                                        <div class="box-header with-border">
-                                            <h3 class="box-title">Harga Weekday</h3>
-                                        </div>
-                                        <div class="box-body">
-                                            <div class="form-group">
-                                                <label>Harga 6 jam:</label>
-                                                <input type="number" name="harga1" class="form-control" required>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label>Harga 12 jam:</label>
-                                                <input type="number" name="harga2" class="form-control" required>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label>Harga 24 jam:</label>
-                                                <input type="number" name="harga3" class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="box box-success">
-                                        <div class="box-header with-border">
-                                            <h3 class="box-title">Harga Weekend</h3>
-                                        </div>
-                                        <div class="box-body">
-                                            <div class="form-group">
-                                                <label>Harga 6 jam:</label>
-                                                <input type="number" name="harga4" class="form-control" required>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label>Harga 12 jam:</label>
-                                                <input type="number" name="harga5" class="form-control" required>
-                                            </div>
-                                            
-                                            <div class="form-group">
-                                                <label>Harga 24 jam:</label>
-                                                <input type="number" name="harga6" class="form-control" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <!-- /.box-body -->
 
@@ -174,9 +136,6 @@ include 'header.php';
 <!-- /.content-wrapper -->
 
 <?php
-// Include sidebar
 include 'sidebar.php';
-
-// Include footer
 include 'footer.php';
 ?>

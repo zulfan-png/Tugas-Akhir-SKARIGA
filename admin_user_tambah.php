@@ -33,8 +33,13 @@ include 'header.php';
                     <form action="admin_user_proses_tambah.php" method="post">
                         <div class="box-body">
                             <div class="form-group">
-                                <label>Nama</label>
-                                <input type="text" name="user" class="form-control" required>
+                                <label>Nama Lengkap</label>
+                                <input type="text" name="nama_lengkap" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" name="username" class="form-control" required>
                             </div>
                             
                             <div class="form-group">
@@ -53,10 +58,17 @@ include 'header.php';
                             </div>
 
                             <div class="form-group">
+                                <label>Alamat</label>
+                                <textarea name="alamat" class="form-control" rows="3"></textarea>
+                            </div>
+
+                            <div class="form-group">
                                 <label>Level</label>
                                 <select name="level" class="form-control" required>
-                                    <option value="1">User</option>
-                                    <option value="2">Admin</option>
+                                    <option value="customer">Customer</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="operator">Operator</option>
+                                    <option value="supir">Supir</option>
                                 </select>
                             </div>
                         </div>

@@ -454,12 +454,28 @@
         </div>
 
         <?php
-        // Query untuk mengambil data bus yang statusnya 'Tersedia' saja
-        $query = "SELECT b.*, 
-                 (SELECT gambar_url FROM bus_gambar WHERE bus_id = b.id LIMIT 1) as gambar_utama 
+        // Query untuk mengambil data bus yang statusnya 'Tersedia' saja dengan JOIN ke tabel perusahaan_bus dan harga_bus
+        $query = "SELECT 
+                    b.id,
+                    b.`tipe bus`,
+                    b.jenis,
+                    b.kapasitas,
+                    b.fasilitas,
+                    b.deskripsi,
+                    b.status,
+                    pb.nama_perusahaan,
+                    (SELECT gambar_url FROM bus_gambar WHERE bus_id = b.id LIMIT 1) as gambar_utama,
+                    (SELECT MIN(harga) FROM harga_bus WHERE bus_id = b.id AND jenis_harga = 'Paket 6 Jam') as harga_terendah
                  FROM bus b 
+                 LEFT JOIN perusahaan_bus pb ON b.perusahaan_id = pb.id
                  WHERE b.status = 'Tersedia'";
         $result = mysqli_query($connect, $query);
+        
+        // Cek jika query gagal
+        if (!$result) {
+            die("Query error: " . mysqli_error($connect));
+        }
+        
         $jumlah_bus_tersedia = mysqli_num_rows($result);
         ?>
 
@@ -489,15 +505,14 @@
                         $fasilitas_array = array_slice($fasilitas_array, 0, 3);
                     }
                     
-                    // Harga mulai dari (ambil harga terkecil)
-                    $harga_array = [$row['harga1'], $row['harga2'], $row['harga3'], $row['harga4'], $row['harga5'], $row['harga6']];
-                    $harga_terendah = min($harga_array);
+                    // Harga mulai dari (ambil harga paket 6 jam)
+                    $harga_terendah = $row['harga_terendah'] ? $row['harga_terendah'] : 0;
             ?>
                 <div class="card">
                     <a href="user_detail.php?id=<?php echo $row['id'] ?>" class="card-link">
                         <div class="card-header <?php echo $bgClass; ?>" style="<?php echo $backgroundImage; ?>">
                             <div class="card-header-content">
-                                <div class="card-title"><?php echo $row['perusahaan'] ?> - <?php echo $row['tipe bus'] ?></div>
+                                <div class="card-title"><?php echo $row['nama_perusahaan'] ?> - <?php echo $row['tipe bus'] ?></div>
                                 <div class="card-destination">
                                     <i class="fas fa-bus"></i>
                                     <?php echo $row['jenis'] ?> • <?php echo $row['kapasitas'] ?> Kursi

@@ -48,57 +48,61 @@ session_start();
                                         <th>Fasilitas</th>
                                         <th>Deskripsi</th>
                                         <th>Gambar</th>
-                                        <th>Harga Weekday</th>
-                                        <th>Harga Weekend</th>
+                                        <th>Harga</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $query = "SELECT b.*, 
+                                    $query = "SELECT b.*, p.nama_perusahaan,
                                              (SELECT gambar_url FROM bus_gambar WHERE bus_id = b.id LIMIT 1) as gambar_utama 
-                                             FROM bus b";
+                                             FROM bus b 
+                                             LEFT JOIN perusahaan_bus p ON b.perusahaan_id = p.id";
                                     $result = mysqli_query($connect, $query);
 
                                     if (mysqli_num_rows($result) > 0) {
                                         while($row = mysqli_fetch_array($result)){
                                     ?>
                                         <tr>
-                                            <td><?php echo $row['perusahaan'] ?></td>
+                                            <td><?php echo $row['nama_perusahaan'] ?></td>
                                             <td><?php echo $row['tipe bus'] ?></td>
                                             <td><?php echo $row['jenis'] ?></td>
                                             <td><?php echo $row['kapasitas'] ?></td>
                                             <td>
-                                                <span class="label label-<?php echo $row['status'] == 'Tersedia' ? 'success' : 'warning' ?>">
+                                                <span class="label label-<?php 
+                                                    echo $row['status'] == 'Tersedia' ? 'success' : 
+                                                         ($row['status'] == 'Dalam Perawatan' ? 'warning' : 'danger');
+                                                ?>">
                                                     <?php echo $row['status'] ?>
                                                 </span>
-                                                <br>
                                             </td>
                                             <td><?php echo substr($row['fasilitas'], 0, 30) . '...' ?></td>
                                             <td><?php echo substr($row['deskripsi'], 0, 30) . '...' ?></td>
                                             <td>
                                                 <?php if(!empty($row['gambar_utama'])): ?>
-                                                    <img src="uploads/<?php echo $row['gambar_utama'] ?>" class="gambar-thumb">
+                                                    <img src="uploads/<?php echo $row['gambar_utama'] ?>" width="50" height="50" style="object-fit: cover;">
                                                 <?php else: ?>
-                                                    <span class="no-image">No Image</span>
+                                                    <span class="text-muted">No Image</span>
                                                 <?php endif; ?>
-                                                <a href="admin_bus_gambar.php?id=<?php echo $row['id'] ?>" class="btn btn-xs btn-info btn-gambar">
+                                                <br>
+                                                <a href="admin_bus_gambar.php?id=<?php echo $row['id'] ?>" class="btn btn-xs btn-info btn-sm mt-1">
                                                     <i class="fa fa-image"></i> Kelola
                                                 </a>
                                             </td>
                                             <td>
                                                 <small>
-                                                    6j: Rp <?php echo number_format($row['harga1'], 0, ',', '.') ?><br>
-                                                    12j: Rp <?php echo number_format($row['harga2'], 0, ',', '.') ?><br>
-                                                    24j: Rp <?php echo number_format($row['harga3'], 0, ',', '.') ?>
+                                                    <?php
+                                                    // Ambil harga dari tabel harga_bus
+                                                    $harga_query = "SELECT jenis_harga, harga FROM harga_bus WHERE bus_id = " . $row['id'] . " LIMIT 3";
+                                                    $harga_result = mysqli_query($connect, $harga_query);
+                                                    while($harga = mysqli_fetch_array($harga_result)) {
+                                                        echo $harga['jenis_harga'] . ": Rp " . number_format($harga['harga'], 0, ',', '.') . "<br>";
+                                                    }
+                                                    ?>
                                                 </small>
-                                            </td>
-                                            <td>
-                                                <small>
-                                                    6j: Rp <?php echo number_format($row['harga4'], 0, ',', '.') ?><br>
-                                                    12j: Rp <?php echo number_format($row['harga5'], 0, ',', '.') ?><br>
-                                                    24j: Rp <?php echo number_format($row['harga6'], 0, ',', '.') ?>
-                                                </small>
+                                                <a href="admin_bus_harga.php?id=<?php echo $row['id'] ?>" class="btn btn-xs btn-warning btn-sm mt-1">
+                                                    <i class="fa fa-edit"></i> Kelola
+                                                </a>
                                             </td>
                                             <td>
                                                 <div class="btn-group">
@@ -114,7 +118,7 @@ session_start();
                                     <?php }
                                     } else { ?>
                                         <tr>
-                                            <td colspan="11" style="text-align: center; padding: 20px;">
+                                            <td colspan="10" style="text-align: center; padding: 20px;">
                                                 <i class="fa fa-exclamation-circle"></i> Tidak ada data bus
                                             </td>
                                         </tr>

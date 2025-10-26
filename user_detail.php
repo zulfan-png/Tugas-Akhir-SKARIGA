@@ -12,20 +12,58 @@ if (isset($_GET['logout'])) {
 // Ambil ID bus dari URL
 $id = $_GET['id'];
 
-// Query data bus
-$query_bus = "SELECT * FROM bus WHERE id = $id";
+// Query data bus dengan JOIN perusahaan
+$query_bus = "SELECT b.*, p.nama_perusahaan 
+              FROM bus b 
+              LEFT JOIN perusahaan_bus p ON b.perusahaan_id = p.id 
+              WHERE b.id = $id";
 $result_bus = mysqli_query($connect, $query_bus);
+
+// Cek jika query berhasil
+if (!$result_bus) {
+    die("Error: " . mysqli_error($connect));
+}
+
 $bus = mysqli_fetch_array($result_bus);
+
+// Jika bus tidak ditemukan
+if (!$bus) {
+    die("Bus tidak ditemukan");
+}
 
 // Query gambar bus
 $query_gambar = "SELECT * FROM bus_gambar WHERE bus_id = $id";
 $result_gambar = mysqli_query($connect, $query_gambar);
+$jumlah_gambar = mysqli_num_rows($result_gambar);
+
+// Query harga bus dari tabel harga_bus
+$query_harga = "SELECT * FROM harga_bus WHERE bus_id = $id ORDER BY 
+                CASE jenis_harga 
+                    WHEN 'Paket 6 Jam' THEN 1
+                    WHEN 'Paket 12 Jam' THEN 2  
+                    WHEN 'Paket 24 Jam' THEN 3
+                    WHEN 'Paket 6 Jam (Weekend)' THEN 4
+                    WHEN 'Paket 12 Jam (Weekend)' THEN 5
+                    WHEN 'Paket 24 Jam (Weekend)' THEN 6
+                    WHEN 'Luar Kota' THEN 7
+                    ELSE 8
+                END";
+$result_harga = mysqli_query($connect, $query_harga);
 
 // Format fasilitas
 $fasilitas_array = [];
 if (!empty($bus['fasilitas'])) {
     $fasilitas_array = explode(", ", $bus['fasilitas']);
 }
+
+// Kumpulkan semua harga
+$harga_paket = [];
+while($harga = mysqli_fetch_array($result_harga)) {
+    $harga_paket[] = $harga;
+}
+
+// Reset pointer result
+mysqli_data_seek($result_harga, 0);
 ?>
 
 <!DOCTYPE html>
@@ -33,7 +71,7 @@ if (!empty($bus['fasilitas'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $bus['perusahaan'] ?> - <?php echo $bus['tipe bus'] ?> | BISATA</title>
+    <title><?php echo $bus['nama_perusahaan'] ?> - <?php echo $bus['tipe bus'] ?> | BISATA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -266,6 +304,22 @@ if (!empty($bus['fasilitas'])) {
             color: #1e293b;
             font-weight: 500;
             font-size: 15px;
+        }
+
+        /* Status styles */
+        .status-tersedia {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .status-perawatan {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .status-tidak-tersedia {
+            color: #ef4444;
+            font-weight: 600;
         }
 
         /* Fasilitas - Pindah ke bawah spesifikasi dan di atas deskripsi */
@@ -574,9 +628,10 @@ if (!empty($bus['fasilitas'])) {
             <!-- Image Slider 16:9 -->
             <div class="image-slider">
                 <div class="slider-container" id="sliderContainer">
-                    <?php if (mysqli_num_rows($result_gambar) > 0): ?>
+                    <?php if ($jumlah_gambar > 0): ?>
                         <?php 
                         $image_index = 0;
+                        mysqli_data_seek($result_gambar, 0); // Reset pointer
                         while($gambar = mysqli_fetch_array($result_gambar)): 
                         ?>
                             <img src="uploads/<?php echo $gambar['gambar_url'] ?>" 
@@ -593,7 +648,7 @@ if (!empty($bus['fasilitas'])) {
                     <?php endif; ?>
                 </div>
 
-                <?php if (mysqli_num_rows($result_gambar) > 1): ?>
+                <?php if ($jumlah_gambar > 1): ?>
                     <button class="slider-arrow prev" onclick="changeSlide(-1)">
                         <i class="fas fa-chevron-left"></i>
                     </button>
@@ -602,7 +657,7 @@ if (!empty($bus['fasilitas'])) {
                     </button>
                     
                     <div class="slider-nav" id="sliderNav">
-                        <?php for($i = 0; $i < mysqli_num_rows($result_gambar); $i++): ?>
+                        <?php for($i = 0; $i < $jumlah_gambar; $i++): ?>
                             <div class="slider-dot <?php echo $i === 0 ? 'active' : ''; ?>" 
                                  data-index="<?php echo $i; ?>" 
                                  onclick="goToSlide(<?php echo $i; ?>)"></div>
@@ -613,7 +668,7 @@ if (!empty($bus['fasilitas'])) {
 
             <!-- Bus Info - Layout Baru yang Lebih Rapi -->
             <div class="bus-info">
-                <h1 class="bus-title"><?php echo $bus['perusahaan'] ?> - <?php echo $bus['tipe bus'] ?></h1>
+                <h1 class="bus-title"><?php echo $bus['nama_perusahaan'] ?> - <?php echo $bus['tipe bus'] ?></h1>
                 
                 <!-- Spesifikasi dalam grid yang rapi -->
                 <div class="bus-specs">
@@ -621,7 +676,7 @@ if (!empty($bus['fasilitas'])) {
                         <i class="fas fa-building"></i>
                         <div>
                             <div class="spec-label">Perusahaan</div>
-                            <div class="spec-value"><?php echo $bus['perusahaan'] ?></div>
+                            <div class="spec-value"><?php echo $bus['nama_perusahaan'] ?></div>
                         </div>
                     </div>
                     <div class="spec-item">
@@ -645,6 +700,29 @@ if (!empty($bus['fasilitas'])) {
                             <div class="spec-value"><?php echo $bus['kapasitas'] ?> Kursi</div>
                         </div>
                     </div>
+                    <div class="spec-item">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <div class="spec-label">Status</div>
+                            <div class="spec-value">
+                                <?php 
+                                $status_class = '';
+                                switch($bus['status']) {
+                                    case 'Tersedia':
+                                        $status_class = 'status-tersedia';
+                                        break;
+                                    case 'Dalam Perawatan':
+                                        $status_class = 'status-perawatan';
+                                        break;
+                                    case 'Tidak Tersedia':
+                                        $status_class = 'status-tidak-tersedia';
+                                        break;
+                                }
+                                ?>
+                                <span class="<?php echo $status_class; ?>"><?php echo $bus['status'] ?></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -652,127 +730,161 @@ if (!empty($bus['fasilitas'])) {
             <div class="facilities-section">
                 <h3 class="section-title">Fasilitas</h3>
                 <div class="facilities-grid">
-                    <?php foreach($fasilitas_array as $fasilitas): ?>
+                    <?php if (!empty($fasilitas_array)): ?>
+                        <?php foreach($fasilitas_array as $fasilitas): ?>
+                            <div class="facility-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span><?php echo trim($fasilitas) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
                         <div class="facility-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span><?php echo $fasilitas ?></span>
+                            <i class="fas fa-info-circle"></i>
+                            <span>Tidak ada fasilitas tambahan</span>
                         </div>
-                    <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
 
             <!-- Deskripsi - Sekarang di bawah fasilitas -->
             <div class="description-section">
                 <h3 class="section-title">Deskripsi</h3>
-                <p class="description-text"><?php echo $bus['deskripsi'] ?></p>
+                <p class="description-text">
+                    <?php echo !empty($bus['deskripsi']) ? nl2br($bus['deskripsi']) : 'Tidak ada deskripsi tersedia untuk bus ini.'; ?>
+                </p>
             </div>
         </div>
 
-        <!-- Harga -->
-        <div class="pricing-section">
-            <div class="pricing-header">
-                <h2 class="pricing-title">Daftar Harga Sewa</h2>
-                <p class="price-note">*Harga sudah termasuk sopir, BBM, dan tol. Tidak termasuk biaya parkir dan akomodasi sopir</p>
-            </div>
-            
-            <div class="pricing-grid">
-                <div class="price-category">
-                    <div class="category-header">
-                        <div class="category-icon weekday-icon">
-                            <i class="fas fa-briefcase"></i>
-                        </div>
-                        <div>
-                            <h4 class="category-title">Weekday</h4>
-                            <p class="category-subtitle">Senin - Jumat</p>
-                        </div>
-                    </div>
-                    <div class="price-items">
-                        <div class="price-item">
-                            <span class="duration">
-                                <i class="fas fa-clock"></i>
-                                6 Jam
-                            </span>
-                            <span class="price">
-                                Rp <?php echo number_format($bus['harga1'], 0, ',', '.') ?>
-                                <span class="price-period">per paket</span>
-                            </span>
-                        </div>
-                        <div class="price-item">
-                            <span class="duration">
-                                <i class="fas fa-clock"></i>
-                                12 Jam
-                            </span>
-                            <span class="price">
-                                Rp <?php echo number_format($bus['harga2'], 0, ',', '.') ?>
-                                <span class="price-period">per paket</span>
-                            </span>
-                        </div>
-                        <div class="price-item">
-                            <span class="duration">
-                                <i class="fas fa-clock"></i>
-                                24 Jam / Per-Hari
-                            </span>
-                            <span class="price">
-                                Rp <?php echo number_format($bus['harga3'], 0, ',', '.') ?>
-                                <span class="price-period">per paket</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="price-category">
-                    <div class="category-header">
-                        <div class="category-icon weekend-icon">
-                            <i class="fas fa-umbrella-beach"></i>
-                        </div>
-                        <div>
-                            <h4 class="category-title">Weekend</h4>
-                            <p class="category-subtitle">Sabtu - Minggu / Hari Libur</p>
-                        </div>
-                    </div>
-                    <div class="price-items">
-                        <div class="price-item">
-                            <span class="duration">
-                                <i class="fas fa-clock"></i>
-                                6 Jam
-                            </span>
-                            <span class="price">
-                                Rp <?php echo number_format($bus['harga4'], 0, ',', '.') ?>
-                                <span class="price-period">per paket</span>
-                            </span>
-                        </div>
-                        <div class="price-item">
-                            <span class="duration">
-                                <i class="fas fa-clock"></i>
-                                12 Jam
-                            </span>
-                            <span class="price">
-                                Rp <?php echo number_format($bus['harga5'], 0, ',', '.') ?>
-                                <span class="price-period">per paket</span>
-                            </span>
-                        </div>
-                        <div class="price-item">
-                            <span class="duration">
-                                <i class="fas fa-clock"></i>
-                                24 Jam / Per-Hari
-                            </span>
-                            <span class="price">
-                                Rp <?php echo number_format($bus['harga6'], 0, ',', '.') ?>
-                                <span class="price-period">per paket</span>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cta-section">
-                <button class="book-btn" onclick="bookBus()">
-                    <i class="fas fa-calendar-check"></i>
-                    Pesan Sekarang
-                </button>
-            </div>
-        </div>
+       <!-- Harga -->
+<div class="pricing-section">
+    <div class="pricing-header">
+        <h2 class="pricing-title">Daftar Harga Sewa</h2>
+        <p class="price-note">*Harga sudah termasuk sopir, BBM, dan tol. Tidak termasuk biaya parkir dan akomodasi sopir</p>
     </div>
+    
+    <div class="pricing-grid">
+        <?php if (!empty($harga_paket)): ?>
+            <?php 
+            // Kelompokkan harga berdasarkan jenis - DIUBAH
+            $harga_weekday = array_filter($harga_paket, function($harga) {
+                return in_array($harga['jenis_harga'], ['Paket 6 Jam', 'Paket 12 Jam', 'Paket 24 Jam']);
+            });
+            
+            $harga_weekend = array_filter($harga_paket, function($harga) {
+                return in_array($harga['jenis_harga'], ['Paket 6 Jam (Weekend)', 'Paket 12 Jam (Weekend)', 'Paket 24 Jam (Weekend)']);
+            });
+            
+            $harga_lainnya = array_filter($harga_paket, function($harga) {
+                return in_array($harga['jenis_harga'], ['Luar Kota']);
+            });
+            ?>
+            
+            <?php if (!empty($harga_weekday)): ?>
+            <div class="price-category">
+                <div class="category-header">
+                    <div class="category-icon weekday-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div>
+                        <h4 class="category-title">Weekday</h4>
+                        <p class="category-subtitle">Senin - Jumat</p>
+                    </div>
+                </div>
+                <div class="price-items">
+                    <?php foreach($harga_weekday as $harga): ?>
+                    <div class="price-item">
+                        <span class="duration">
+                            <i class="fas fa-clock"></i>
+                            <?php echo $harga['jenis_harga'] ?>
+                        </span>
+                        <span class="price">
+                            Rp <?php echo number_format($harga['harga'], 0, ',', '.') ?>
+                            <span class="price-period">per <?php echo $harga['satuan'] ?></span>
+                        </span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+            
+            <?php if (!empty($harga_weekend)): ?>
+            <div class="price-category">
+                <div class="category-header">
+                    <div class="category-icon weekend-icon">
+                        <i class="fas fa-umbrella-beach"></i>
+                    </div>
+                    <div>
+                        <h4 class="category-title">Weekend</h4>
+                        <p class="category-subtitle">Sabtu - Minggu / Hari Libur</p>
+                    </div>
+                </div>
+                <div class="price-items">
+                    <?php foreach($harga_weekend as $harga): ?>
+                    <div class="price-item">
+                        <span class="duration">
+                            <i class="fas fa-clock"></i>
+                            <?php echo $harga['jenis_harga'] ?>
+                        </span>
+                        <span class="price">
+                            Rp <?php echo number_format($harga['harga'], 0, ',', '.') ?>
+                            <span class="price-period">per <?php echo $harga['satuan'] ?></span>
+                        </span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+            
+            <?php if (!empty($harga_lainnya)): ?>
+            <div class="price-category">
+                <div class="category-header">
+                    <div class="category-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                        <i class="fas fa-road"></i>
+                    </div>
+                    <div>
+                        <h4 class="category-title">Lainnya</h4>
+                        <p class="category-subtitle">Paket khusus</p>
+                    </div>
+                </div>
+                <div class="price-items">
+                    <?php foreach($harga_lainnya as $harga): ?>
+                    <div class="price-item">
+                        <span class="duration">
+                            <i class="fas fa-clock"></i>
+                            <?php echo $harga['jenis_harga'] ?>
+                        </span>
+                        <span class="price">
+                            Rp <?php echo number_format($harga['harga'], 0, ',', '.') ?>
+                            <span class="price-period">per <?php echo $harga['satuan'] ?></span>
+                        </span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+            
+        <?php else: ?>
+            <div class="price-category" style="grid-column: 1 / -1; text-align: center;">
+                <div class="category-header">
+                    <div class="category-icon" style="background: #64748b;">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div>
+                        <h4 class="category-title">Harga Belum Tersedia</h4>
+                        <p class="category-subtitle">Silakan hubungi customer service untuk informasi harga</p>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div class="cta-section">
+        <button class="book-btn" onclick="bookBus()">
+            <i class="fas fa-calendar-check"></i>
+            Pesan Sekarang
+        </button>
+    </div>
+</div>
 
     <script>
         let currentSlide = 0;
