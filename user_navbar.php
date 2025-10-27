@@ -120,9 +120,9 @@ if (isset($_SESSION['user_id'])) {
     <div class="logo">
         <i class="fas fa-bus"></i> BISATA
     </div>
-    <div class="nav-links">  
+    <div class="nav-links">
         <a href="user_home.php">Daftar Bus</a>
-        <a href="user_booking_history.php">Riwayat Pesanan</a>
+        <a href="user_booking_history.php">Riwayat Pesanan</a>  
         <div class="user-info">
             <?php if (isset($_SESSION['user_id']) && $user): ?>
                 <span class="username"><?php echo htmlspecialchars($user['nama_lengkap']); ?></span>

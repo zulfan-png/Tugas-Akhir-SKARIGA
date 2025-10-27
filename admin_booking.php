@@ -2,7 +2,7 @@
 include 'koneksi.php';
 session_start();
 
-// Handle actions (konfirmasi/batal/edit)
+// Handle actions (konfirmasi/batal/edit/approve_edit/approve_cancel)
 if (isset($_GET['action']) && isset($_GET['id'])) {
     $booking_id = $_GET['id'];
     $action = $_GET['action'];
@@ -13,9 +13,45 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     } elseif ($action == 'cancel') {
         $query = "UPDATE pemesanan SET status = 'Dibatalkan' WHERE id = $booking_id";
         $message = "Pesanan berhasil dibatalkan";
+    } elseif ($action == 'approve_edit') {
+        // Setujui edit - reset permintaan edit
+        $query = "UPDATE pemesanan SET permintaan_edit = 'Tidak', data_edit_sebelumnya = NULL WHERE id = $booking_id";
+        $message = "Permintaan edit telah disetujui";
+    } elseif ($action == 'reject_edit') {
+        // Tolak edit - kembalikan data sebelumnya
+        $query_get_old = "SELECT data_edit_sebelumnya FROM pemesanan WHERE id = $booking_id";
+        $result_old = mysqli_query($connect, $query_get_old);
+        $old_data = mysqli_fetch_assoc($result_old);
+        
+        if ($old_data['data_edit_sebelumnya']) {
+            $data_lama = json_decode($old_data['data_edit_sebelumnya'], true);
+            $query = "UPDATE pemesanan SET 
+                      jenis_paket = '".mysqli_real_escape_string($connect, $data_lama['jenis_paket'])."',
+                      tanggal_berangkat = '".mysqli_real_escape_string($connect, $data_lama['tanggal_berangkat'])."',
+                      jam_berangkat = '".mysqli_real_escape_string($connect, $data_lama['jam_berangkat'])."',
+                      tanggal_kembali = '".mysqli_real_escape_string($connect, $data_lama['tanggal_kembali'])."',
+                      lokasi_penjemputan = '".mysqli_real_escape_string($connect, $data_lama['lokasi_penjemputan'])."',
+                      tujuan = '".mysqli_real_escape_string($connect, $data_lama['tujuan'])."',
+                      jumlah_penumpang = ".intval($data_lama['jumlah_penumpang']).",
+                      keterangan = '".mysqli_real_escape_string($connect, $data_lama['keterangan'])."',
+                      permintaan_edit = 'Tidak',
+                      data_edit_sebelumnya = NULL
+                      WHERE id = $booking_id";
+        } else {
+            $query = "UPDATE pemesanan SET permintaan_edit = 'Tidak' WHERE id = $booking_id";
+        }
+        $message = "Permintaan edit telah ditolak";
+    } elseif ($action == 'approve_cancel') {
+        // Setujui pembatalan
+        $query = "UPDATE pemesanan SET status = 'Dibatalkan', permintaan_batal = 'Tidak' WHERE id = $booking_id";
+        $message = "Permintaan pembatalan telah disetujui";
+    } elseif ($action == 'reject_cancel') {
+        // Tolak pembatalan
+        $query = "UPDATE pemesanan SET permintaan_batal = 'Tidak', alasan_batal = NULL WHERE id = $booking_id";
+        $message = "Permintaan pembatalan telah ditolak";
     }
     
-    if (mysqli_query($connect, $query)) {
+    if (isset($query) && mysqli_query($connect, $query)) {
         $success_message = $message;
     } else {
         $error_message = "Terjadi kesalahan: " . mysqli_error($connect);
@@ -36,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['edit_booking'])) {
     }
 }
 
-// Query semua pemesanan - TAMBAH jam_berangkat
+// Query semua pemesanan - TAMBAH kolom baru
 $query = "SELECT p.*, u.nama_lengkap, u.nomor_hp, b.`tipe bus`, b.jenis, per.nama_perusahaan 
           FROM pemesanan p 
           JOIN datauser u ON p.user_id = u.id 
@@ -99,6 +135,16 @@ $result = mysqli_query($connect, $query);
                                                 <h4 class="panel-title">
                                                     <i class="fa fa-bus"></i>
                                                     <?php echo $booking['nama_perusahaan'] ?> - <?php echo $booking['tipe bus'] ?>
+                                                    <?php if ($booking['permintaan_edit'] == 'Ya'): ?>
+                                                        <span class="label label-warning" style="margin-left: 10px;">
+                                                            <i class="fa fa-edit"></i> Permintaan Edit
+                                                        </span>
+                                                    <?php endif; ?>
+                                                    <?php if ($booking['permintaan_batal'] == 'Ya'): ?>
+                                                        <span class="label label-danger" style="margin-left: 10px;">
+                                                            <i class="fa fa-times"></i> Permintaan Batal
+                                                        </span>
+                                                    <?php endif; ?>
                                                 </h4>
                                                 <small>
                                                     <strong><?php echo $booking['nama_lengkap'] ?></strong> 
@@ -170,6 +216,14 @@ $result = mysqli_query($connect, $query);
                                                     </div>
                                                 </div>
                                                 <?php endif; ?>
+                                                <?php if (!empty($booking['alasan_batal'])): ?>
+                                                <div class="row" style="margin-top: 10px;">
+                                                    <div class="col-sm-12">
+                                                        <strong>Alasan Pembatalan:</strong><br>
+                                                        <span style="color: #dc3545;"><?php echo $booking['alasan_batal'] ?></span>
+                                                    </div>
+                                                </div>
+                                                <?php endif; ?>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="row">
@@ -184,10 +238,46 @@ $result = mysqli_query($connect, $query);
                                                         </span>
                                                     </div>
                                                 </div>
+                                                
+                                                <!-- Tampilkan informasi permintaan edit/batal -->
+                                                <?php if ($booking['permintaan_edit'] == 'Ya'): ?>
+                                                    <div class="alert alert-warning" style="margin-top: 10px; padding: 10px;">
+                                                        <strong><i class="fa fa-edit"></i> Permintaan Edit</strong>
+                                                        <br>User mengajukan perubahan data pesanan.
+                                                        <div class="btn-group" style="margin-top: 5px;">
+                                                            <a href="admin_booking.php?action=approve_edit&id=<?php echo $booking['id'] ?>" 
+                                                               class="btn btn-success btn-xs">
+                                                                <i class="fa fa-check"></i> Setujui Edit
+                                                            </a>
+                                                            <a href="admin_booking.php?action=reject_edit&id=<?php echo $booking['id'] ?>" 
+                                                               class="btn btn-danger btn-xs">
+                                                                <i class="fa fa-times"></i> Tolak Edit
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php if ($booking['permintaan_batal'] == 'Ya'): ?>
+                                                    <div class="alert alert-danger" style="margin-top: 10px; padding: 10px;">
+                                                        <strong><i class="fa fa-times"></i> Permintaan Pembatalan</strong>
+                                                        <br>User mengajukan pembatalan pesanan.
+                                                        <div class="btn-group" style="margin-top: 5px;">
+                                                            <a href="admin_booking.php?action=approve_cancel&id=<?php echo $booking['id'] ?>" 
+                                                               class="btn btn-success btn-xs">
+                                                                <i class="fa fa-check"></i> Setujui Batal
+                                                            </a>
+                                                            <a href="admin_booking.php?action=reject_cancel&id=<?php echo $booking['id'] ?>" 
+                                                               class="btn btn-danger btn-xs">
+                                                                <i class="fa fa-times"></i> Tolak Batal
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
+                                                
                                                 <div class="row" style="margin-top: 20px;">
                                                     <div class="col-sm-12">
                                                         <div class="btn-group">
-                                                            <?php if ($booking['status'] == 'Menunggu Konfirmasi'): ?>
+                                                            <?php if ($booking['status'] == 'Menunggu Konfirmasi' && $booking['permintaan_batal'] == 'Tidak'): ?>
                                                                 <a href="admin_booking.php?action=confirm&id=<?php echo $booking['id'] ?>" 
                                                                    class="btn btn-success btn-sm">
                                                                     <i class="fa fa-check"></i> Setujui
