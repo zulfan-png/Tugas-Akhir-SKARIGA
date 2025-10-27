@@ -45,6 +45,7 @@ session_start();
                                         <th>Jenis</th>
                                         <th>Kapasitas</th>
                                         <th>Status</th>
+                                        <th>WhatsApp</th>
                                         <th>Fasilitas</th>
                                         <th>Deskripsi</th>
                                         <th>Gambar</th>
@@ -75,6 +76,9 @@ session_start();
                                                 ?>">
                                                     <?php echo $row['status'] ?>
                                                 </span>
+                                            </td>
+                                            <td>
+                                                    <small><?php echo $row['whatsapp_perusahaan'] ?></small>
                                             </td>
                                             <td><?php echo substr($row['fasilitas'], 0, 30) . '...' ?></td>
                                             <td><?php echo substr($row['deskripsi'], 0, 30) . '...' ?></td>
@@ -118,7 +122,7 @@ session_start();
                                     <?php }
                                     } else { ?>
                                         <tr>
-                                            <td colspan="10" style="text-align: center; padding: 20px;">
+                                            <td colspan="11" style="text-align: center; padding: 20px;">
                                                 <i class="fa fa-exclamation-circle"></i> Tidak ada data bus
                                             </td>
                                         </tr>

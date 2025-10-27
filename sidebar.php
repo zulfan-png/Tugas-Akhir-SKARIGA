@@ -8,6 +8,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <section class="sidebar">
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header">MAIN NAVIGATION</li>
+            <li class="<?php echo $current_page == 'admin_booking.php' ? 'active' : ''; ?>">
+                <a href="admin_booking.php">
+                    <i class="fa fa-calendar-check-o"></i> <span>Management Pesanan</span>
+                </a>
+            </li>
             <li class="<?php echo $current_page == 'admin_bus.php' ? 'active' : ''; ?>">
                 <a href="admin_bus.php">
                     <i class="fa fa-bus"></i> <span>Data Bus</span>

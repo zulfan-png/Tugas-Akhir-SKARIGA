@@ -79,6 +79,14 @@ include 'header.php';
                                 <input type="number" name="kapasitas" class="form-control" value="<?php echo $row['kapasitas'] ?>" required>
                             </div>
 
+                            <!-- Tambahkan field WhatsApp setelah field Status -->
+                            <div class="form-group">
+                                <label>Nomor WhatsApp:</label>
+                                <input type="text" name="whatsapp_perusahaan" class="form-control" 
+                                    value="<?php echo $row['whatsapp_perusahaan'] ?>" 
+                                    placeholder="Contoh: +62123456789 (tanpa spasi, atau tanda baca)">
+                            </div>
+
                             <div class="form-group">
                                 <label>Status:</label>
                                 <select name="status" class="form-control" required>

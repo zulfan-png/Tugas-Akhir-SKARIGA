@@ -115,6 +115,32 @@
             box-shadow: 0 6px 12px rgba(30, 64, 175, 0.25);
         }
         
+        /* Tombol register */
+        .btn-register {
+            width: 100%;
+            background-color: transparent;
+            color: #1e40af;
+            border: 2px solid #1e40af;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-register:hover {
+            background-color: #1e40af;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(30, 64, 175, 0.25);
+        }
+        
         /* Footer login */
         .login-footer {
             margin-top: 25px;
@@ -141,7 +167,6 @@
         <div class="login-card">
             <div class="login-header">
                 <h1>BUS LOGIN</h1>
-                <p>Masuk ke sistem admin bus</p>
             </div>
             <form action="login.php" method="post" class="login-form">
                 <div class="form-group">
@@ -156,8 +181,15 @@
                     <!-- FIXED: name="password" -->
                 </div>
                 
-                <button type="submit" class="btn-login">Masuk</button>
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Masuk
+                </button>
             </form>
+            
+            <div class="login-footer">
+                <p>Belum punya akun? <a href="register.php" style="color: #1e40af; font-weight: 600; text-decoration: none;">Daftar di sini</a></p>
+            </div>
         </div>
     </div>
 </body>

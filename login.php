@@ -3,7 +3,7 @@ include 'koneksi.php';
 
 // Ambil data dari form
 $username = $_POST['username'];
-$password = $_POST['password'];
+$password = $_POST['password']; // Konversi password ke MD5
 
 // Query untuk mencari user
 $query = "SELECT * FROM datauser WHERE username = '$username' AND password = '$password'";

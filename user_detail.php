@@ -9,10 +9,21 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
+// Query data user jika sudah login
+$user = null;
+if (isset($_SESSION['user_id'])) {
+    $user_id_session = $_SESSION['user_id'];
+    $query_user = "SELECT * FROM datauser WHERE id = $user_id_session";
+    $result_user = mysqli_query($connect, $query_user);
+    if ($result_user && mysqli_num_rows($result_user) > 0) {
+        $user = mysqli_fetch_array($result_user);
+    }
+}
+
 // Ambil ID bus dari URL
 $id = $_GET['id'];
 
-// Query data bus dengan JOIN perusahaan
+// Query data bus dengan JOIN perusahaan - DIPERBAIKI: ganti $bus_id menjadi $id
 $query_bus = "SELECT b.*, p.nama_perusahaan 
               FROM bus b 
               LEFT JOIN perusahaan_bus p ON b.perusahaan_id = p.id 
@@ -64,6 +75,12 @@ while($harga = mysqli_fetch_array($result_harga)) {
 
 // Reset pointer result
 mysqli_data_seek($result_harga, 0);
+
+// DEBUG: Cek data WhatsApp
+// echo "<pre>";
+// echo "WhatsApp Number: " . $bus['whatsapp_perusahaan'] . "\n";
+// echo "Is Empty: " . (empty($bus['whatsapp_perusahaan']) ? 'Yes' : 'No') . "\n";
+// echo "</pre>";
 ?>
 
 <!DOCTYPE html>
@@ -87,62 +104,6 @@ mysqli_data_seek($result_harga, 0);
             line-height: 1.6;
         }
         
-        /* Navbar */
-        .navbar {
-            background: #1e40af;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .logo {
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        
-        .nav-links a:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        
-        .logout-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: background 0.3s;
-            font-size: 14px;
-        }
-        
-        .logout-btn:hover {
-            background: #dc2626;
-        }
-
         /* Container utama */
         .container {
             max-width: 1200px;
@@ -274,7 +235,7 @@ mysqli_data_seek($result_harga, 0);
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin-bottom: 25px;
-        }
+        }   
 
         .spec-item {
             display: flex;
@@ -513,13 +474,18 @@ mysqli_data_seek($result_harga, 0);
             text-align: center;
             padding-top: 30px;
             border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
         .book-btn {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             border: none;
-            padding: 18px 60px;
+            padding: 18px 40px;
             border-radius: 12px;
             font-size: 18px;
             font-weight: 700;
@@ -529,6 +495,72 @@ mysqli_data_seek($result_harga, 0);
             align-items: center;
             gap: 12px;
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .book-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        /* WhatsApp Button Styles */
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #25D366;
+            color: white;
+            padding: 18px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-btn:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+            color: white;
+        }
+
+        /* WhatsApp Info Box */
+        .whatsapp-info {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .whatsapp-info i {
+            font-size: 24px;
+        }
+
+        .whatsapp-info-content {
+            flex: 1;
+        }
+
+        .whatsapp-info-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .whatsapp-info-link {
+            color: white;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .whatsapp-info-link:hover {
+            color: #e0f2fe;
         }
 
         /* Empty state untuk gambar */
@@ -585,9 +617,16 @@ mysqli_data_seek($result_harga, 0);
                 gap: 10px;
             }
             
-            .book-btn {
-                padding: 15px 40px;
+            .book-btn, .whatsapp-btn {
+                padding: 15px 30px;
                 font-size: 16px;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .cta-section {
+                flex-direction: column;
+                gap: 15px;
             }
             
             .description-section {
@@ -599,24 +638,18 @@ mysqli_data_seek($result_harga, 0);
                 padding: 20px;
                 margin-bottom: 20px;
             }
+
+            .whatsapp-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
-        <div class="logo">
-            <i class="fas fa-bus"></i> BISATA
-        </div>
-        <div class="nav-links">
-            <a href="user_dashboard.php">Daftar Bus</a>
-            <a href="#about">Tentang Kami</a>
-            <a href="#contact">Kontak</a>
-            <div class="user-info">
-                <a href="?logout=true" class="logout-btn" onclick="return confirmLogout()">Logout</a>
-            </div>
-        </div>
-    </nav>
+    <?php include 'user_navbar.php'; ?>
 
     <div class="container">
         <!-- Breadcrumb -->
@@ -883,6 +916,19 @@ mysqli_data_seek($result_harga, 0);
             <i class="fas fa-calendar-check"></i>
             Pesan Sekarang
         </button>
+        
+        <?php if (!empty($bus['whatsapp_perusahaan'])): ?>
+            <a href="https://wa.me/<?php echo $bus['whatsapp_perusahaan'] ?>?text=Halo,%20saya%20tertarik%20dengan%20bus%20<?php echo urlencode($bus['tipe bus'] . ' - ' . $bus['jenis']) ?>%20dari%20<?php echo urlencode($bus['nama_perusahaan']) ?>%20dan%20ingin%20bertanya%20lebih%20lanjut." 
+               target="_blank" 
+               class="whatsapp-btn">
+                <i class="fab fa-whatsapp"></i>
+                Tanya via WhatsApp
+            </a>
+        <?php else: ?>
+            <div style="text-align: center; padding: 10px; background: #fef3c7; border-radius: 8px; color: #92400e;">
+                <i class="fas fa-info-circle"></i> WhatsApp belum tersedia untuk bus ini
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -927,13 +973,21 @@ mysqli_data_seek($result_harga, 0);
         }, 5000);
 
         function bookBus() {
-            alert('Fitur pemesanan akan segera tersedia!');
-            // window.location.href = 'booking.php?id=<?php echo $bus['id']; ?>';
+            window.location.href = 'booking.php?id=<?php echo $bus['id']; ?>';
         }
 
         function confirmLogout() {
             return confirm('Apakah Anda yakin ingin logout?');
         }
+
+        // Debug function untuk cek WhatsApp
+        function debugWhatsApp() {
+            console.log('WhatsApp Number:', '<?php echo $bus['whatsapp_perusahaan']; ?>');
+            console.log('Is Empty:', '<?php echo empty($bus['whatsapp_perusahaan']) ? 'Yes' : 'No'; ?>');
+        }
+        
+        // Panggil debug saat load
+        // debugWhatsApp();
     </script>
 </body>
 </html>

@@ -7,6 +7,7 @@ $tipe_bus = $_POST['tipe_bus'];
 $jenis = $_POST['jenis'];
 $kapasitas = $_POST['kapasitas'];
 $status = $_POST['status'];
+$whatsapp_perusahaan = $_POST['whatsapp_perusahaan'];
 $deskripsi = $_POST['deskripsi'];
 
 // Proses fasilitas dari checkbox
@@ -21,6 +22,7 @@ $query = "UPDATE bus SET
           jenis = '$jenis',
           kapasitas = '$kapasitas',
           status = '$status',
+          whatsapp_perusahaan = '$whatsapp_perusahaan',
           fasilitas = '$fasilitas',
           deskripsi = '$deskripsi',
           updated_at = CURRENT_TIMESTAMP

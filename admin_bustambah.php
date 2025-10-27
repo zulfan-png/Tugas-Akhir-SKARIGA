@@ -118,6 +118,13 @@ include 'header.php';
                                 <label>Deskripsi:</label>
                                 <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
                             </div>
+
+                            <!-- Tambahkan field WhatsApp setelah field Status -->
+                            <div class="form-group">
+                                <label>Nomor WhatsApp:</label>
+                                <input type="text" name="whatsapp_perusahaan" class="form-control" 
+                                    placeholder="Contoh: +62123456789 (tanpa spasi, atau tanda baca)">  
+                            </div>
                         </div>
                         <!-- /.box-body -->
 

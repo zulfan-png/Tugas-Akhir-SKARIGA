@@ -8,6 +8,30 @@
         echo "<script>window.location.href = 'index.html'</script>";
         exit();
     }
+
+    // Query data user jika sudah login - TAMBAHAN INI
+    $user = null;
+    if (isset($_SESSION['user_id'])) {
+        $user_id = $_SESSION['user_id'];
+        $query_user = "SELECT * FROM datauser WHERE id = $user_id";
+        $result_user = mysqli_query($connect, $query_user);
+        if ($result_user && mysqli_num_rows($result_user) > 0) {
+            $user = mysqli_fetch_array($result_user);
+        }
+    }
+
+    // Handle search functionality
+    $search_keyword = "";
+    $where_condition = "WHERE b.status = 'Tersedia'";
+    
+    if (isset($_GET['search']) && !empty($_GET['search'])) {
+        $search_keyword = mysqli_real_escape_string($connect, $_GET['search']);
+        $where_condition = "WHERE b.status = 'Tersedia' AND (
+                            b.`tipe bus` LIKE '%$search_keyword%' OR 
+                            b.jenis LIKE '%$search_keyword%' OR
+                            pb.nama_perusahaan LIKE '%$search_keyword%'
+                        )";
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,81 +53,6 @@
             background-color: #f8fafc;
             color: #334155;
             line-height: 1.6;
-        }
-        
-        /* Navbar */
-        .navbar {
-            background: #1e40af;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .logo {
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        
-        .nav-links a:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        
-        .logout-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: background 0.3s;
-            font-size: 14px;
-        }
-        
-        .logout-btn:hover {
-            background: #dc2626;
-        }
-
-        .login-btn {
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: background 0.3s;
-            font-size: 14px;
-        }
-        
-        .login-btn:hover {
-            background: #0da271;
         }
         
         /* Container utama */
@@ -186,6 +135,111 @@
         .header p {
             color: #64748b;
             font-size: 16px;
+        }
+        
+        /* Search Section */
+        .search-section {
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+            padding: 0 20px;
+        }
+        
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            font-size: 16px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #1e40af;
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
+        }
+        
+        .search-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1e40af;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .search-button:hover {
+            background: #3730a3;
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .search-examples {
+            text-align: center;
+            margin-top: 15px;
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .search-examples span {
+            display: inline-block;
+            margin: 0 8px;
+            padding: 4px 12px;
+            background: #f1f5f9;
+            border-radius: 15px;
+            color: #475569;
+        }
+        
+        /* Search Results Info */
+        .search-results-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+        
+        .search-results-info .results-count {
+            color: #1e40af;
+            font-weight: 600;
+        }
+        
+        .search-results-info .search-keyword {
+            color: #ef4444;
+            font-weight: 600;
+            background: #fef2f2;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+        
+        .clear-search {
+            color: #64748b;
+            text-decoration: none;
+            margin-left: 10px;
+            padding: 5px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .clear-search:hover {
+            background: #f1f5f9;
+            color: #374151;
         }
         
         /* Grid card */
@@ -416,24 +470,19 @@
             font-weight: 600;
             color: #1e40af;
         }
+
+        /* Highlight search results */
+        .highlight {
+            background-color: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #92400e;
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
-        <div class="logo">
-            <i class="fas fa-bus"></i> BISATA
-        </div>
-        <div class="nav-links">
-            <a href="#bus-list">Daftar Bus</a>
-            <a href="#about">Tentang Kami</a>
-            <a href="#contact">Kontak</a>
-                <div class="user-info">
-                    <a href="?logout=true" class="logout-btn" onclick="return confirmLogout()">Logout
-                    </a>
-                </div>
-        </div>
-    </nav>
+     <?php include 'user_navbar.php'; ?>
 
     <!-- Hero Section dengan Gambar -->
     <section class="hero">
@@ -453,8 +502,22 @@
             <p>Temukan bus perfect untuk perjalanan Anda</p>
         </div>
 
+        <!-- Search Section -->
+        <div class="search-section">
+            <form method="GET" action="" class="search-container">
+                <input type="text" 
+                       name="search" 
+                       class="search-input" 
+                       placeholder="Cari bus berdasarkan nama, jenis, atau perusahaan..." 
+                       value="<?php echo htmlspecialchars($search_keyword); ?>">
+                <button type="submit" class="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+
         <?php
-        // Query untuk mengambil data bus yang statusnya 'Tersedia' saja dengan JOIN ke tabel perusahaan_bus dan harga_bus
+        // Query untuk mengambil data bus dengan kondisi pencarian
         $query = "SELECT 
                     b.id,
                     b.`tipe bus`,
@@ -468,7 +531,8 @@
                     (SELECT MIN(harga) FROM harga_bus WHERE bus_id = b.id AND jenis_harga = 'Paket 6 Jam') as harga_terendah
                  FROM bus b 
                  LEFT JOIN perusahaan_bus pb ON b.perusahaan_id = pb.id
-                 WHERE b.status = 'Tersedia'";
+                 $where_condition
+                 ORDER BY b.created_at DESC";
         $result = mysqli_query($connect, $query);
         
         // Cek jika query gagal
@@ -479,10 +543,23 @@
         $jumlah_bus_tersedia = mysqli_num_rows($result);
         ?>
 
+        <!-- Search Results Info -->
+        <?php if (!empty($search_keyword)): ?>
+        <div class="search-results-info">
+            <p>
+                Menampilkan <span class="results-count"><?php echo $jumlah_bus_tersedia; ?></span> hasil untuk 
+                <span class="search-keyword">"<?php echo htmlspecialchars($search_keyword); ?>"</span>
+                <a href="user_home.php" class="clear-search">
+                    <i class="fas fa-times"></i> Hapus Pencarian
+                </a>
+            </p>
+        </div>
+        <?php else: ?>
         <!-- Counter bus tersedia -->
         <div class="bus-counter">
             Menampilkan <span class="counter-number"><?php echo $jumlah_bus_tersedia; ?></span> bus tersedia untuk Anda
         </div>
+        <?php endif; ?>
         
         <div class="cards-container" id="bus-cards">
             <?php
@@ -507,15 +584,19 @@
                     
                     // Harga mulai dari (ambil harga paket 6 jam)
                     $harga_terendah = $row['harga_terendah'] ? $row['harga_terendah'] : 0;
+
+                    // Highlight search results
+                    $highlight_title = $row['nama_perusahaan'] . ' - ' . $row['tipe bus'];
+                    $highlight_jenis = $row['jenis'];
             ?>
                 <div class="card">
                     <a href="user_detail.php?id=<?php echo $row['id'] ?>" class="card-link">
                         <div class="card-header <?php echo $bgClass; ?>" style="<?php echo $backgroundImage; ?>">
                             <div class="card-header-content">
-                                <div class="card-title"><?php echo $row['nama_perusahaan'] ?> - <?php echo $row['tipe bus'] ?></div>
+                                <div class="card-title"><?php echo $highlight_title; ?></div>
                                 <div class="card-destination">
                                     <i class="fas fa-bus"></i>
-                                    <?php echo $row['jenis'] ?> • <?php echo $row['kapasitas'] ?> Kursi
+                                    <?php echo $highlight_jenis; ?> • <?php echo $row['kapasitas'] ?> Kursi
                                 </div>
                             </div>
                             <div class="status-badge status-tersedia">
@@ -551,11 +632,29 @@
             } else { ?>
                 <div class="empty-state">
                     <i class="fas fa-bus-slash"></i>
-                    <h3>Maaf, tidak ada bus tersedia saat ini</h3>
-                    <p>Semua bus sedang dipesan atau sedang dalam perawatan.</p>
-                    <p style="margin-top: 10px; font-size: 14px;">
-                        Silakan coba lagi nanti atau hubungi customer service kami.
+                    <h3>
+                        <?php if (!empty($search_keyword)): ?>
+                            Tidak ditemukan bus dengan kata kunci "<?php echo htmlspecialchars($search_keyword); ?>"
+                        <?php else: ?>
+                            Maaf, tidak ada bus tersedia saat ini
+                        <?php endif; ?>
+                    </h3>
+                    <p>
+                        <?php if (!empty($search_keyword)): ?>
+                            Coba gunakan kata kunci lain atau lihat semua bus yang tersedia.
+                        <?php else: ?>
+                            Semua bus sedang dipesan atau sedang dalam perawatan.
+                        <?php endif; ?>
                     </p>
+                    <?php if (!empty($search_keyword)): ?>
+                        <a href="user_home.php" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #1e40af; color: white; text-decoration: none; border-radius: 5px;">
+                            <i class="fas fa-bus"></i> Lihat Semua Bus
+                        </a>
+                    <?php else: ?>
+                        <p style="margin-top: 10px; font-size: 14px;">
+                            Silakan coba lagi nanti atau hubungi customer service kami.
+                        </p>
+                    <?php endif; ?>
                 </div>
             <?php } ?>
         </div>
@@ -565,6 +664,23 @@
         function confirmLogout() {
             return confirm('Apakah Anda yakin ingin logout?');
         }
+
+        // Auto focus on search input when page loads if there's a search keyword
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('.search-input');
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchParam = urlParams.get('search');
+            
+            if (searchParam && searchInput) {
+                searchInput.focus();
+                searchInput.setSelectionRange(searchParam.length, searchParam.length);
+            }
+        });
+
+        // Clear search when clicking the clear button
+        function clearSearch() {
+            window.location.href = 'user_home.php';
+        }
     </script>
 </body>
-</html>
+</html>     
