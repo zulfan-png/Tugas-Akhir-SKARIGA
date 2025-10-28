@@ -6,7 +6,7 @@ ini_set('display_errors', 1);
 $mysql = 'localhost';
 $user = 'root';
 $pass = '';
-$db = 'dbresto'; // Pastikan nama database benar
+$db = 'bus_management'; // Pastikan nama database benar
 
 $connect = mysqli_connect($mysql, $user, $pass, $db);
 
