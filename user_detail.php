@@ -2,6 +2,29 @@
 include 'koneksi.php';
 session_start();
 
+// Cek apakah user sudah login
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.html");
+    exit();
+}
+
+// Cek session timeout (opsional - 1 jam)
+if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time'] > 3600)) {
+    session_destroy();
+    header("Location: index.html?timeout=1");
+    exit();
+}
+
+// Perbarui waktu session
+$_SESSION['login_time'] = time();
+
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: index.html");
+    exit();
+}
+
 // Handle logout
 if (isset($_GET['logout'])) {
     session_destroy();
@@ -979,15 +1002,6 @@ mysqli_data_seek($result_harga, 0);
         function confirmLogout() {
             return confirm('Apakah Anda yakin ingin logout?');
         }
-
-        // Debug function untuk cek WhatsApp
-        function debugWhatsApp() {
-            console.log('WhatsApp Number:', '<?php echo $bus['whatsapp_perusahaan']; ?>');
-            console.log('Is Empty:', '<?php echo empty($bus['whatsapp_perusahaan']) ? 'Yes' : 'No'; ?>');
-        }
-        
-        // Panggil debug saat load
-        // debugWhatsApp();
     </script>
 </body>
 </html>

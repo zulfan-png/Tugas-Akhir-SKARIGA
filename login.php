@@ -1,9 +1,10 @@
 <?php
+session_start();
 include 'koneksi.php';
 
 // Ambil data dari form
 $username = $_POST['username'];
-$password = $_POST['password']; // Konversi password ke MD5
+$password = $_POST['password'];
 
 // Query untuk mencari user
 $query = "SELECT * FROM datauser WHERE username = '$username' AND password = '$password'";
@@ -12,12 +13,12 @@ $result = mysqli_query($connect, $query);
 if ($result && mysqli_num_rows($result) > 0) {
     $row = mysqli_fetch_assoc($result);
     
-    // Start session
-    session_start();
+    // Set session variables
     $_SESSION['user_id'] = $row['id'];
     $_SESSION['username'] = $row['username'];
     $_SESSION['nama_lengkap'] = $row['nama_lengkap'];
     $_SESSION['level'] = $row['level'];
+    $_SESSION['login_time'] = time();
     
     // Redirect berdasarkan level
     switch ($row['level']) {
@@ -34,7 +35,8 @@ if ($result && mysqli_num_rows($result) > 0) {
             header('Location: supir_dashboard.php');
             break;
         default:
-            header('Location: admin_bus.php');
+            // Default redirect untuk level yang tidak dikenali
+            header('Location: user_home.php');
             break;
     }
     exit;

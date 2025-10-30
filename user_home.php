@@ -1,37 +1,30 @@
 <?php
-    include 'koneksi.php';
-    session_start();
+include 'koneksi.php';
+session_start();
 
-    // Handle logout
-    if (isset($_GET['logout'])) {
-        session_destroy();
-        echo "<script>window.location.href = 'index.html'</script>";
-        exit();
+// Query data user jika sudah login - TAMBAHAN INI
+$user = null;
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $query_user = "SELECT * FROM datauser WHERE id = $user_id";
+    $result_user = mysqli_query($connect, $query_user);
+    if ($result_user && mysqli_num_rows($result_user) > 0) {
+        $user = mysqli_fetch_array($result_user);
     }
+}
 
-    // Query data user jika sudah login - TAMBAHAN INI
-    $user = null;
-    if (isset($_SESSION['user_id'])) {
-        $user_id = $_SESSION['user_id'];
-        $query_user = "SELECT * FROM datauser WHERE id = $user_id";
-        $result_user = mysqli_query($connect, $query_user);
-        if ($result_user && mysqli_num_rows($result_user) > 0) {
-            $user = mysqli_fetch_array($result_user);
-        }
-    }
+// Handle search functionality
+$search_keyword = "";
+$where_condition = "WHERE b.status = 'Tersedia'";
 
-    // Handle search functionality
-    $search_keyword = "";
-    $where_condition = "WHERE b.status = 'Tersedia'";
-    
-    if (isset($_GET['search']) && !empty($_GET['search'])) {
-        $search_keyword = mysqli_real_escape_string($connect, $_GET['search']);
-        $where_condition = "WHERE b.status = 'Tersedia' AND (
-                            b.`tipe bus` LIKE '%$search_keyword%' OR 
-                            b.jenis LIKE '%$search_keyword%' OR
-                            pb.nama_perusahaan LIKE '%$search_keyword%'
-                        )";
-    }
+if (isset($_GET['search']) && !empty($_GET['search'])) {
+    $search_keyword = mysqli_real_escape_string($connect, $_GET['search']);
+    $where_condition = "WHERE b.status = 'Tersedia' AND (
+                        b.`tipe bus` LIKE '%$search_keyword%' OR 
+                        b.jenis LIKE '%$search_keyword%' OR
+                        pb.nama_perusahaan LIKE '%$search_keyword%'
+                    )";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -683,4 +676,4 @@
         }
     </script>
 </body>
-</html>     
+</html>

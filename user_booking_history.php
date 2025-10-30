@@ -4,6 +4,29 @@ session_start();
 
 // Cek apakah user sudah login
 if (!isset($_SESSION['user_id'])) {
+    header("Location: index.html");
+    exit();
+}
+
+// Cek session timeout (opsional - 1 jam)
+if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time'] > 3600)) {
+    session_destroy();
+    header("Location: index.html?timeout=1");
+    exit();
+}
+
+// Perbarui waktu session
+$_SESSION['login_time'] = time();
+
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: index.html");
+    exit();
+}
+
+// Cek apakah user sudah login
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
@@ -166,12 +189,17 @@ $result_booking = mysqli_query($connect, $query_booking);
             font-weight: 600;
         }
         
-        .status-menunggu {
+        .status-menunggu-konfirmasi {
             background: #fef3c7;
             color: #92400e;
         }
         
         .status-dikonfirmasi {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-selesai {
             background: #d1fae5;
             color: #065f46;
         }

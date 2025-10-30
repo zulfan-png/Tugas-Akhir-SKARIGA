@@ -4,6 +4,29 @@ session_start();
 
 // Cek apakah user sudah login
 if (!isset($_SESSION['user_id'])) {
+    header("Location: index.html");
+    exit();
+}
+
+// Cek session timeout (opsional - 1 jam)
+if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time'] > 3600)) {
+    session_destroy();
+    header("Location: index.html?timeout=1");
+    exit();
+}
+
+// Perbarui waktu session
+$_SESSION['login_time'] = time();
+
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: index.html");
+    exit();
+}
+
+// Cek apakah user sudah login
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }

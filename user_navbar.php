@@ -1,5 +1,12 @@
 <?php
-// user_navbar.php
+// Pastikan session sudah dimulai
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Include koneksi database
+include 'koneksi.php';
+
 // Query data user jika sudah login
 $user = null;
 if (isset($_SESSION['user_id'])) {
@@ -126,7 +133,7 @@ if (isset($_SESSION['user_id'])) {
         <div class="user-info">
             <?php if (isset($_SESSION['user_id']) && $user): ?>
                 <span class="username"><?php echo htmlspecialchars($user['nama_lengkap']); ?></span>
-                <a href="?logout=true" class="logout-btn" onclick="return confirmLogout()">
+                <a href="index.html" class="logout-btn" onclick="return confirmLogout()">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             <?php else: ?>
