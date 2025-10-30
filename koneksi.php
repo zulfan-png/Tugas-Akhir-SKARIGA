@@ -6,8 +6,9 @@ ini_set('display_errors', 1);
 $mysql = 'localhost';
 $user = 'root';
 $pass = '';
-$db = 'bus_management_web'; // Pastikan nama database benar
+$db = 'bus_management_web';
 
+// Gunakan variabel $koneksi untuk konsistensi
 $connect = mysqli_connect($mysql, $user, $pass, $db);
 
 // Check connection
@@ -17,6 +18,4 @@ if (!$connect) {
 
 // Set charset
 mysqli_set_charset($connect, "utf8mb4");
-
-// if($connect) echo "Sukses Koneksi";
 ?>
