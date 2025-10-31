@@ -176,7 +176,7 @@ while($row = mysqli_fetch_assoc($result_data)) {
     z-index: 10;
 }
 .small-box h3 {
-    font-size: 38px;
+    font-size: 28px;
     font-weight: bold;
     margin: 0 0 10px 0;
     white-space: nowrap;
@@ -268,11 +268,6 @@ while($row = mysqli_fetch_assoc($result_data)) {
                     <li><a href="index.php"><i class="fa fa-dashboard"></i> Home</a></li>
                     <li class="active">Laporan Pendapatan</li>
                 </ol>
-            </div>
-            <div class="col-md-4 text-right">
-                <a href="?export_excel=1" class="btn btn-success" style="margin-top: 15px;" onclick="showLoading()">
-                    <i class="fa fa-file-excel-o"></i> Export to Excel
-                </a>
             </div>
         </div>
     </section>
