@@ -245,15 +245,6 @@ while($row = mysqli_fetch_assoc($result_data)) {
 }
 </style>
 
-<!-- Loading overlay -->
-<div class="loading" id="loading">
-    <div class="loading-content">
-        <i class="fa fa-spinner fa-spin fa-3x fa-fw text-primary"></i>
-        <h3>Membuat Laporan Excel...</h3>
-        <p>Harap tunggu, file sedang dipersiapkan</p>
-    </div>
-</div>
-
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -429,32 +420,6 @@ while($row = mysqli_fetch_assoc($result_data)) {
 <!-- /.content-wrapper -->
 
 <?php include 'footer.php'; ?>
-
-<script>
-function showLoading() {
-    document.getElementById('loading').style.display = 'block';
-    // Otomatis sembunyikan loading setelah 5 detik (fallback)
-    setTimeout(function() {
-        document.getElementById('loading').style.display = 'none';
-    }, 5000);
-}
-
-// Sembunyikan loading ketika halaman selesai dimuat
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('loading').style.display = 'none';
-    
-    // Tambahkan event listener untuk semua link export
-    const exportLinks = document.querySelectorAll('a[href*="export_excel"]');
-    exportLinks.forEach(link => {
-        link.addEventListener('click', showLoading);
-    });
-});
-
-// Sembunyikan loading ketika pengguna kembali ke halaman (misal setelah download)
-window.addEventListener('pageshow', function() {
-    document.getElementById('loading').style.display = 'none';
-});
-</script>
 
 <?php
 // Tutup koneksi
